@@ -1,0 +1,321 @@
+{
+    "id": "2f623c042f7c2495",
+    "type": "subflow",
+    "name": "fmt trace",
+    "info": "Create Plotly trace.\r\n\r\nOutput should be forwarded to add-node and \r\noptionally to memory-node.\r\n\r\n",
+    "category": "Plotly",
+    "in": [
+        {
+            "x": 60,
+            "y": 80,
+            "wires": [
+                {
+                    "id": "c064c15c718930d9"
+                }
+            ]
+        }
+    ],
+    "out": [
+        {
+            "x": 940,
+            "y": 140,
+            "wires": [
+                {
+                    "id": "fbfb9bee81eaa95c",
+                    "port": 0
+                },
+                {
+                    "id": "6dcce9166e282a19",
+                    "port": 0
+                },
+                {
+                    "id": "cde51dcd38cf9b33",
+                    "port": 2
+                }
+            ]
+        }
+    ],
+    "env": [
+        {
+            "name": "chart_name",
+            "type": "str",
+            "value": "",
+            "ui": {
+                "label": {
+                    "en-US": "Chart name"
+                },
+                "type": "input",
+                "opts": {
+                    "types": [
+                        "str"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "chart_history_size",
+            "type": "num",
+            "value": "8640",
+            "ui": {
+                "label": {
+                    "en-US": "History size"
+                },
+                "type": "input",
+                "opts": {
+                    "types": [
+                        "num",
+                        "env"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "trace_parameters",
+            "type": "json",
+            "value": "{\"shape\":\"linear\",\"color\":\"rgb(244,218,64)\",\"width\":2,\"dash\":\"solid\"}",
+            "ui": {
+                "label": {
+                    "en-US": "Parameters"
+                },
+                "type": "input",
+                "opts": {
+                    "types": [
+                        "json"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "trace_name",
+            "type": "str",
+            "value": "",
+            "ui": {
+                "label": {
+                    "en-US": "Trace name"
+                },
+                "type": "input",
+                "opts": {
+                    "types": [
+                        "str"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "format_ts",
+            "type": "str",
+            "value": "1",
+            "ui": {
+                "type": "select",
+                "opts": {
+                    "opts": [
+                        {
+                            "l": {
+                                "en-US": "ISO8601"
+                            },
+                            "v": "1"
+                        },
+                        {
+                            "l": {
+                                "en-US": "time+ms"
+                            },
+                            "v": "2"
+                        },
+                        {
+                            "l": {
+                                "en-US": "pre-format"
+                            },
+                            "v": "3"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "show_status",
+            "type": "bool",
+            "value": "true",
+            "ui": {
+                "label": {
+                    "en-US": "Show status"
+                },
+                "type": "input",
+                "opts": {
+                    "types": [
+                        "bool"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "buffer_size",
+            "type": "num",
+            "value": "80",
+            "ui": {
+                "label": {
+                    "en-US": "Buffer size"
+                },
+                "type": "spinner",
+                "opts": {
+                    "min": 2,
+                    "max": 100
+                }
+            }
+        }
+    ],
+    "meta": {
+        "module": "tequ-node-red-plotly-trace",
+        "version": "0.0.1",
+        "author": "juha.autioniemi@lapinamk.fi",
+        "desc": "Format data to plotly trace",
+        "license": "MIT"
+    },
+    "color": "#3FADB5",
+    "inputLabels": [
+        "trace data in"
+    ],
+    "outputLabels": [
+        "trace data out"
+    ],
+    "icon": "node-red/template.svg",
+    "status": {
+        "x": 660,
+        "y": 260,
+        "wires": [
+            {
+                "id": "befd9d174f284459",
+                "port": 0
+            }
+        ]
+    },
+    "flow": [
+        {
+            "id": "fbfb9bee81eaa95c",
+            "type": "moment",
+            "z": "2f623c042f7c2495",
+            "name": "ts",
+            "topic": "",
+            "input": "",
+            "inputType": "date",
+            "inTz": "ETC/UTC",
+            "adjAmount": 0,
+            "adjType": "days",
+            "adjDir": "add",
+            "format": "HH:mm:ss.SSS",
+            "locale": "en-US",
+            "output": "payload.timestamp",
+            "outputType": "msg",
+            "outTz": "ETC/UTC",
+            "x": 650,
+            "y": 80,
+            "wires": [
+                []
+            ]
+        },
+        {
+            "id": "c064c15c718930d9",
+            "type": "function",
+            "z": "2f623c042f7c2495",
+            "name": "Append data",
+            "func": "let chart_history_size;\nlet trace_parameters = {};\nlet chart_name = \"\";\nlet trace_name = \"\";\nlet value = msg.payload;\nlet buffer_size;\nlet payload;\nlet returnData = false;\n\nif(\"topic\" in msg){\n    trace_name = msg.topic;\n}\nelse{\n    trace_name = env.get(\"trace_name\")\n}\n\n//Override if present in msg\nif (\"chart_name\" in msg) {\n    chart_name = msg.chart_name\n}\nelse {\n    chart_name = env.get(\"chart_name\")\n}\n\nif (\"buffer_size\" in msg) {\n    buffer_size = msg.buffer_size\n}\nelse {\n    buffer_size = env.get(\"buffer_size\")\n}\n\nif (\"trace_parameters\" in msg) {\n    trace_parameters = msg.trace_parameters\n}\nelse {\n    trace_parameters = env.get(\"trace_parameters\")\n}\n\nif (\"chart_history_size\" in msg) {\n    chart_history_size = msg.chart_history_size\n}\nelse {\n    chart_history_size = env.get(\"chart_history_size\")\n}\n\nif (buffer_size < 2){\n    returnData = true;\n    payload = {\n        \"value\": value,\n        \"timestamp\": \"\",\n        \"chart_history_size\": chart_history_size\n    };\n\n    if (env.get(\"format_ts\") == 3) {\n\n        if (\"timestamp\" in msg) {\n            payload.timestamp = msg.timestamp;\n        }\n        else if (\"ts\" in msg) {\n            payload.timestamp = msg.ts;\n        }\n    }\n}\nelse{\n    let buffer = context.get(trace_name) || {}\n    let ts = \"\"\n\n    if (env.get(\"format_ts\") == 3) {\n        if (\"timestamp\" in msg) {\n            ts = msg.timestamp;\n        }\n        else if (\"ts\" in msg) {\n            ts = msg.ts;\n        }\n    }\n\n    if(\"value\" in buffer){\n        buffer.value.push(value)\n        buffer.timestamp.push(ts)\n    }\n    else{\n        buffer.value = []\n        buffer.timestamp = []\n        buffer.value.push(value)\n        buffer.timestamp.push(ts)\n    }\n    \n    context.set(trace_name,buffer)\n\n    if (buffer.value.length >= buffer_size){\n       payload = {\n            \"value\": buffer.value,\n            \"timestamp\": buffer.timestamp,\n            \"chart_history_size\": chart_history_size\n        };\n        returnData = true;\n        context.set(trace_name,{})\n    }\n}\n\nmsg.topic = trace_name;\nmsg.chart_name = chart_name;\nmsg.payload = payload;\nmsg.line_params = trace_parameters\nmsg.action = \"append_data\";\n\nif(env.get(\"show_status\")){\n    node.status({ fill: \"blue\", shape: \"dot\", text: trace_name + \": \" + value });\n}\nelse{\n    //\n}\n\nif(returnData){\n    return msg;\n}\nelse {\n}",
+            "outputs": 1,
+            "timeout": 0,
+            "noerr": 0,
+            "initialize": "",
+            "finalize": "",
+            "libs": [],
+            "x": 210,
+            "y": 80,
+            "wires": [
+                [
+                    "cde51dcd38cf9b33"
+                ]
+            ]
+        },
+        {
+            "id": "befd9d174f284459",
+            "type": "status",
+            "z": "2f623c042f7c2495",
+            "name": "",
+            "scope": null,
+            "x": 220,
+            "y": 260,
+            "wires": [
+                []
+            ]
+        },
+        {
+            "id": "cde51dcd38cf9b33",
+            "type": "switch",
+            "z": "2f623c042f7c2495",
+            "name": "format_ts?",
+            "property": "format_ts",
+            "propertyType": "env",
+            "rules": [
+                {
+                    "t": "eq",
+                    "v": "1",
+                    "vt": "num"
+                },
+                {
+                    "t": "eq",
+                    "v": "2",
+                    "vt": "num"
+                },
+                {
+                    "t": "eq",
+                    "v": "3",
+                    "vt": "num"
+                }
+            ],
+            "checkall": "true",
+            "repair": false,
+            "outputs": 3,
+            "x": 390,
+            "y": 80,
+            "wires": [
+                [
+                    "6dcce9166e282a19"
+                ],
+                [
+                    "fbfb9bee81eaa95c"
+                ],
+                []
+            ]
+        },
+        {
+            "id": "6dcce9166e282a19",
+            "type": "moment",
+            "z": "2f623c042f7c2495",
+            "name": "ts",
+            "topic": "",
+            "input": "",
+            "inputType": "date",
+            "inTz": "ETC/UTC",
+            "adjAmount": 0,
+            "adjType": "days",
+            "adjDir": "add",
+            "format": "YYYY-MM-DD HH:mm:ss.SSS",
+            "locale": "en-US",
+            "output": "payload.timestamp",
+            "outputType": "msg",
+            "outTz": "ETC/UTC",
+            "x": 650,
+            "y": 40,
+            "wires": [
+                []
+            ]
+        },
+        {
+            "id": "9f8920aa7e156482",
+            "type": "subflow:2f623c042f7c2495",
+            "z": "37f93c27a1c435dd",
+            "name": "",
+            "x": 340,
+            "y": 1200,
+            "wires": [
+                []
+            ]
+        }
+    ]
+}
