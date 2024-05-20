@@ -164,11 +164,45 @@
                     "max": 100
                 }
             }
+        },
+        {
+            "name": "in_tz",
+            "type": "str",
+            "value": "ETC/UTC",
+            "ui": {
+                "label": {
+                    "en-US": "Input timezone"
+                },
+                "type": "input",
+                "opts": {
+                    "types": [
+                        "str",
+                        "env"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "out_tz",
+            "type": "str",
+            "value": "Europe/Helsinki",
+            "ui": {
+                "label": {
+                    "en-US": "Output timezone"
+                },
+                "type": "input",
+                "opts": {
+                    "types": [
+                        "str",
+                        "env"
+                    ]
+                }
+            }
         }
     ],
     "meta": {
         "module": "tequ-node-red-plotly-trace",
-        "version": "0.0.2",
+        "version": "0.0.3",
         "author": "juha.autioniemi@lapinamk.fi",
         "desc": "Format data to plotly trace",
         "license": "MIT"
@@ -220,7 +254,7 @@
             "type": "function",
             "z": "2f623c042f7c2495",
             "name": "Append data",
-            "func": "let chart_history_size;\nlet trace_parameters = {};\nlet chart_name = \"\";\nlet trace_name = \"\";\nlet value = msg.payload;\nlet buffer_size;\nlet payload;\nlet returnData = false;\n\nif(\"topic\" in msg){\n    trace_name = msg.topic;\n}\nelse{\n    trace_name = env.get(\"trace_name\")\n}\n\n//Override if present in msg\nif (\"chart_name\" in msg) {\n    chart_name = msg.chart_name\n}\nelse {\n    chart_name = env.get(\"chart_name\")\n}\n\nif (\"buffer_size\" in msg) {\n    buffer_size = msg.buffer_size\n}\nelse {\n    buffer_size = env.get(\"buffer_size\")\n}\n\nif (\"trace_parameters\" in msg) {\n    trace_parameters = msg.trace_parameters\n}\nelse {\n    trace_parameters = env.get(\"trace_parameters\")\n}\n\nif (\"chart_history_size\" in msg) {\n    chart_history_size = msg.chart_history_size\n}\nelse {\n    chart_history_size = env.get(\"chart_history_size\")\n}\n\nif (buffer_size < 2){\n    returnData = true;\n    payload = {\n        \"value\": value,\n        \"timestamp\": \"\",\n        \"chart_history_size\": chart_history_size\n    };\n\n    if (env.get(\"format_ts\") == 3) {\n\n        if (\"timestamp\" in msg) {\n            payload.timestamp = msg.timestamp;\n        }\n        else if (\"ts\" in msg) {\n            payload.timestamp = msg.ts;\n        }\n    }\n}\nelse{\n    let buffer = context.get(trace_name) || {}\n    let ts = \"\"\n\n    if (env.get(\"format_ts\") == 3) {\n        if (\"timestamp\" in msg) {\n            ts = msg.timestamp;\n        }\n        else if (\"ts\" in msg) {\n            ts = msg.ts;\n        }\n    }\n\n    if(\"value\" in buffer){\n        buffer.value.push(value)\n        buffer.timestamp.push(ts)\n    }\n    else{\n        buffer.value = []\n        buffer.timestamp = []\n        buffer.value.push(value)\n        buffer.timestamp.push(ts)\n    }\n    \n    context.set(trace_name,buffer)\n\n    if (buffer.value.length >= buffer_size){\n       payload = {\n            \"value\": buffer.value,\n            \"timestamp\": buffer.timestamp,\n            \"chart_history_size\": chart_history_size\n        };\n        returnData = true;\n        context.set(trace_name,{})\n    }\n}\n\nmsg.topic = trace_name;\nmsg.chart_name = chart_name;\nmsg.payload = payload;\nmsg.line_params = trace_parameters\nmsg.action = \"append_data\";\n\nif(env.get(\"show_status\")){\n    node.status({ fill: \"blue\", shape: \"dot\", text: trace_name + \": \" + value });\n}\nelse{\n    //\n}\n\nif(returnData){\n    return msg;\n}\nelse {\n}",
+            "func": "let chart_history_size;\nlet trace_parameters = {};\nlet chart_name = \"\";\nlet trace_name = \"\";\nlet value = msg.payload;\nlet buffer_size;\nlet payload;\nlet returnData = false;\nlet input_timezone = \"ETC/UTC\";\nlet output_timezone = \"ETC/UTC\"; \n\nif(\"topic\" in msg){\n    trace_name = msg.topic;\n}\nelse{\n    trace_name = env.get(\"trace_name\")\n}\n\n//Override if present in msg\nif (\"input_timezone\" in msg) {\n    input_timezone = msg.input_timezone\n}\nelse {\n    input_timezone = env.get(\"in_tz\")\n}\n\nif (\"output_timezone\" in msg) {\n    output_timezone = msg.output_timezone\n}\nelse {\n    output_timezone = env.get(\"out_tz\")\n}\n\n\nif (\"chart_name\" in msg) {\n    chart_name = msg.chart_name\n}\nelse {\n    chart_name = env.get(\"chart_name\")\n}\n\nif (\"buffer_size\" in msg) {\n    buffer_size = msg.buffer_size\n}\nelse {\n    buffer_size = env.get(\"buffer_size\")\n}\n\nif (\"trace_parameters\" in msg) {\n    trace_parameters = msg.trace_parameters\n}\nelse {\n    trace_parameters = env.get(\"trace_parameters\")\n}\n\nif (\"chart_history_size\" in msg) {\n    chart_history_size = msg.chart_history_size\n}\nelse {\n    chart_history_size = env.get(\"chart_history_size\")\n}\n\nif (buffer_size < 2){\n    returnData = true;\n    payload = {\n        \"value\": value,\n        \"timestamp\": \"\",\n        \"chart_history_size\": chart_history_size\n    };\n\n    if (env.get(\"format_ts\") == 3) {\n\n        if (\"timestamp\" in msg) {\n            payload.timestamp = msg.timestamp;\n        }\n        else if (\"ts\" in msg) {\n            payload.timestamp = msg.ts;\n        }\n    }\n}\nelse{\n    let buffer = context.get(trace_name) || {}\n    let ts = \"\"\n\n    if (env.get(\"format_ts\") == 3) {\n        if (\"timestamp\" in msg) {\n            ts = msg.timestamp;\n        }\n        else if (\"ts\" in msg) {\n            ts = msg.ts;\n        }\n    }\n\n    if(\"value\" in buffer){\n        buffer.value.push(value)\n        buffer.timestamp.push(ts)\n    }\n    else{\n        buffer.value = []\n        buffer.timestamp = []\n        buffer.value.push(value)\n        buffer.timestamp.push(ts)\n    }\n    \n    context.set(trace_name,buffer)\n\n    if (buffer.value.length >= buffer_size){\n       payload = {\n            \"value\": buffer.value,\n            \"timestamp\": buffer.timestamp,\n            \"chart_history_size\": chart_history_size\n        };\n        returnData = true;\n        context.set(trace_name,{})\n    }\n}\n\nmsg.topic = trace_name;\nmsg.chart_name = chart_name;\nmsg.payload = payload;\nmsg.line_params = trace_parameters\nmsg.action = \"append_data\";\nmsg.inTz = input_timezone;\nmsg.outTz = output_timezone;\n\nif(env.get(\"show_status\")){\n    node.status({ fill: \"blue\", shape: \"dot\", text: trace_name + \": \" + value });\n}\nelse{\n    //\n}\n\nif(returnData){\n    return msg;\n}\nelse {\n}",
             "outputs": 1,
             "timeout": 0,
             "noerr": 0,
@@ -305,6 +339,17 @@
             "outTz": "ETC/UTC",
             "x": 650,
             "y": 40,
+            "wires": [
+                []
+            ]
+        },
+        {
+            "id": "95c652c3083b119d",
+            "type": "subflow:2f623c042f7c2495",
+            "z": "debe57df1350b9f8",
+            "name": "",
+            "x": 240,
+            "y": 1200,
             "wires": [
                 []
             ]
