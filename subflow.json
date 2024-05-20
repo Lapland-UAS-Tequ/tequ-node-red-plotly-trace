@@ -39,7 +39,7 @@
         {
             "name": "chart_name",
             "type": "str",
-            "value": "",
+            "value": "chart_name",
             "ui": {
                 "label": {
                     "en-US": "Chart name"
@@ -88,7 +88,7 @@
         {
             "name": "trace_name",
             "type": "str",
-            "value": "",
+            "value": "trace_name",
             "ui": {
                 "label": {
                     "en-US": "Trace name"
@@ -106,6 +106,9 @@
             "type": "str",
             "value": "1",
             "ui": {
+                "label": {
+                    "en-US": "Time format"
+                },
                 "type": "select",
                 "opts": {
                     "opts": [
@@ -150,14 +153,14 @@
         {
             "name": "buffer_size",
             "type": "num",
-            "value": "80",
+            "value": "0",
             "ui": {
                 "label": {
                     "en-US": "Buffer size"
                 },
                 "type": "spinner",
                 "opts": {
-                    "min": 2,
+                    "min": 0,
                     "max": 100
                 }
             }
@@ -165,7 +168,7 @@
     ],
     "meta": {
         "module": "tequ-node-red-plotly-trace",
-        "version": "0.0.1",
+        "version": "0.0.2",
         "author": "juha.autioniemi@lapinamk.fi",
         "desc": "Format data to plotly trace",
         "license": "MIT"
@@ -302,17 +305,6 @@
             "outTz": "ETC/UTC",
             "x": 650,
             "y": 40,
-            "wires": [
-                []
-            ]
-        },
-        {
-            "id": "9f8920aa7e156482",
-            "type": "subflow:2f623c042f7c2495",
-            "z": "37f93c27a1c435dd",
-            "name": "",
-            "x": 340,
-            "y": 1200,
             "wires": [
                 []
             ]
