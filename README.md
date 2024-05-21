@@ -16,4 +16,3 @@ Create Plotly trace.
 Output should be forwarded to add-node and 
 optionally to memory-node.
 
-
