@@ -2,7 +2,7 @@
     "id": "2f623c042f7c2495",
     "type": "subflow",
     "name": "fmt trace",
-    "info": "Create Plotly trace.\r\n\r\nOutput should be forwarded to add-node and \r\noptionally to memory-node.\r\n",
+    "info": "Create Plotly trace.\r\n\r\nOutput should be forwarded to \"add\"-node and optionally to \"memory\"-node.\r\n\r\nUsage of this node requires more or less knowledge about [Plotly.js](https://plotly.com/javascript/configuration-options/) library.\r\n\r\nBy default expects following input message:\r\n\r\n`{\r\n    \"payload\":11.45,\r\n    \"timestamp\":\"2025-10-10T00:00:00Z\"\r\n}`\r\n\r\nParameters can be set in input message:\r\n\r\n - payload = msg.payload (number, value that is added to chart)\r\n - timestamp = msg.timestamp (timestamp, if pre-formatted use Plotly format YYYY-MM-DD HH:mm:ss.SSS)\r\n - Type = msg.chart_type (\"scatter\" | \"bar\")\r\n - Mode = msg.chart_mode (\"lines\" | \"lines+markers\" | \"markers\")\r\n - Chart name = msg.chart_name (string)\r\n - History size = msg.chart_history_size (number)\r\n - Line = msg.trace_parameters (JSON, Plotly format)\r\n- Marker = msg.marker_parameters (JSON, Plotly format)\r\n- Trace name = msg.topic (string)\r\n- Time format = msg.format_ts (1 | 2 | 3 | 4 )\r\n- Show status = msg.show_status (true | false)\r\n- Buffer size = msg.buffer_size (number)\r\n- Input timezone = msg.in_tz (Timezone string)\r\n- Output timezone = msg.out_tz (Timezone string)\r\n- Y axis = msg.y_axis (\"y1\" | \"y2\")\r\n- Hover template = msg.hover_template (Plotly format string)\r\n- Action = msg.action (\"update_data\" | \"add_data\" )\r\n\r\nIf using buffering, time format should be set to \"3 = Do not format timestamp\".",
     "category": "Plotly",
     "in": [
         {
@@ -17,8 +17,8 @@
     ],
     "out": [
         {
-            "x": 940,
-            "y": 140,
+            "x": 980,
+            "y": 240,
             "wires": [
                 {
                     "id": "fbfb9bee81eaa95c",
@@ -29,13 +29,81 @@
                     "port": 0
                 },
                 {
+                    "id": "5baa100c2653965d",
+                    "port": 0
+                },
+                {
                     "id": "cde51dcd38cf9b33",
                     "port": 2
+                },
+                {
+                    "id": "6556dea93f5072f2",
+                    "port": 0
                 }
             ]
         }
     ],
     "env": [
+        {
+            "name": "chart_type",
+            "type": "str",
+            "value": "scatter",
+            "ui": {
+                "label": {
+                    "en-US": "Type"
+                },
+                "type": "select",
+                "opts": {
+                    "opts": [
+                        {
+                            "l": {
+                                "en-US": "scatter"
+                            },
+                            "v": "scatter"
+                        },
+                        {
+                            "l": {
+                                "en-US": "bar"
+                            },
+                            "v": "bar"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "chart_mode",
+            "type": "str",
+            "value": "lines",
+            "ui": {
+                "label": {
+                    "en-US": "Mode"
+                },
+                "type": "select",
+                "opts": {
+                    "opts": [
+                        {
+                            "l": {
+                                "en-US": "lines"
+                            },
+                            "v": "lines"
+                        },
+                        {
+                            "l": {
+                                "en-US": "lines+markers"
+                            },
+                            "v": "lines+markers"
+                        },
+                        {
+                            "l": {
+                                "en-US": "markers"
+                            },
+                            "v": "markers"
+                        }
+                    ]
+                }
+            }
+        },
         {
             "name": "chart_name",
             "type": "str",
@@ -75,7 +143,23 @@
             "value": "{\"shape\":\"linear\",\"color\":\"rgb(244,218,64)\",\"width\":2,\"dash\":\"solid\"}",
             "ui": {
                 "label": {
-                    "en-US": "Parameters"
+                    "en-US": "Line"
+                },
+                "type": "input",
+                "opts": {
+                    "types": [
+                        "json"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "marker_parameters",
+            "type": "json",
+            "value": "{}",
+            "ui": {
+                "label": {
+                    "en-US": "Marker"
                 },
                 "type": "input",
                 "opts": {
@@ -104,7 +188,7 @@
         {
             "name": "format_ts",
             "type": "str",
-            "value": "1",
+            "value": "4",
             "ui": {
                 "label": {
                     "en-US": "Time format"
@@ -114,21 +198,27 @@
                     "opts": [
                         {
                             "l": {
-                                "en-US": "ISO8601"
+                                "en-US": "Create timestamp (ISO8601)"
                             },
                             "v": "1"
                         },
                         {
                             "l": {
-                                "en-US": "time+ms"
+                                "en-US": "Create timestamp (time+ms)"
                             },
                             "v": "2"
                         },
                         {
                             "l": {
-                                "en-US": "pre-format"
+                                "en-US": "Do not format timestamp"
                             },
                             "v": "3"
+                        },
+                        {
+                            "l": {
+                                "en-US": "Format timestamp"
+                            },
+                            "v": "4"
                         }
                     ]
                 }
@@ -198,13 +288,89 @@
                     ]
                 }
             }
+        },
+        {
+            "name": "y_axis",
+            "type": "str",
+            "value": "y1",
+            "ui": {
+                "label": {
+                    "en-US": "Y axis"
+                },
+                "type": "select",
+                "opts": {
+                    "opts": [
+                        {
+                            "l": {
+                                "en-US": "Y1 axis"
+                            },
+                            "v": "y1"
+                        },
+                        {
+                            "l": {
+                                "en-US": "Y2 axis"
+                            },
+                            "v": "y2"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "hover_template",
+            "type": "str",
+            "value": "Price: %{y:$.2f}<extra></extra>",
+            "ui": {
+                "label": {
+                    "en-US": "Hover template"
+                },
+                "type": "input",
+                "opts": {
+                    "types": [
+                        "str",
+                        "num",
+                        "bool",
+                        "json",
+                        "bin",
+                        "env",
+                        "conf-types"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "action",
+            "type": "str",
+            "value": "update_data",
+            "ui": {
+                "label": {
+                    "en-US": "Action"
+                },
+                "type": "select",
+                "opts": {
+                    "opts": [
+                        {
+                            "l": {
+                                "en-US": "Update plot"
+                            },
+                            "v": "update_data"
+                        },
+                        {
+                            "l": {
+                                "en-US": "Add data to plot"
+                            },
+                            "v": "add_data"
+                        }
+                    ]
+                }
+            }
         }
     ],
     "meta": {
         "module": "tequ-node-red-plotly-trace",
-        "version": "0.0.4",
+        "version": "0.2",
         "author": "juha.autioniemi@lapinamk.fi",
-        "desc": "Format data to plotly trace",
+        "desc": "Format Plotly trace",
         "license": "MIT"
     },
     "color": "#3FADB5",
@@ -216,8 +382,8 @@
     ],
     "icon": "node-red/template.svg",
     "status": {
-        "x": 660,
-        "y": 260,
+        "x": 680,
+        "y": 380,
         "wires": [
             {
                 "id": "befd9d174f284459",
@@ -244,7 +410,7 @@
             "outputType": "msg",
             "outTz": "ETC/UTC",
             "x": 650,
-            "y": 80,
+            "y": 160,
             "wires": [
                 []
             ]
@@ -254,7 +420,7 @@
             "type": "function",
             "z": "2f623c042f7c2495",
             "name": "Append data",
-            "func": "let chart_history_size;\nlet trace_parameters = {};\nlet chart_name = \"\";\nlet trace_name = \"\";\nlet value = msg.payload;\nlet buffer_size;\nlet payload;\nlet returnData = false;\nlet input_timezone = \"ETC/UTC\";\nlet output_timezone = \"ETC/UTC\"; \n\nif(\"topic\" in msg){\n    trace_name = msg.topic;\n}\nelse{\n    trace_name = env.get(\"trace_name\")\n}\n\n//Override if present in msg\nif (\"input_timezone\" in msg) {\n    input_timezone = msg.input_timezone\n}\nelse {\n    input_timezone = env.get(\"in_tz\")\n}\n\nif (\"output_timezone\" in msg) {\n    output_timezone = msg.output_timezone\n}\nelse {\n    output_timezone = env.get(\"out_tz\")\n}\n\n\nif (\"chart_name\" in msg) {\n    chart_name = msg.chart_name\n}\nelse {\n    chart_name = env.get(\"chart_name\")\n}\n\nif (\"buffer_size\" in msg) {\n    buffer_size = msg.buffer_size\n}\nelse {\n    buffer_size = env.get(\"buffer_size\")\n}\n\nif (\"trace_parameters\" in msg) {\n    trace_parameters = msg.trace_parameters\n}\nelse {\n    trace_parameters = env.get(\"trace_parameters\")\n}\n\nif (\"chart_history_size\" in msg) {\n    chart_history_size = msg.chart_history_size\n}\nelse {\n    chart_history_size = env.get(\"chart_history_size\")\n}\n\nif (buffer_size < 2){\n    returnData = true;\n    payload = {\n        \"value\": value,\n        \"timestamp\": \"\",\n        \"chart_history_size\": chart_history_size\n    };\n\n    if (env.get(\"format_ts\") == 3) {\n\n        if (\"timestamp\" in msg) {\n            payload.timestamp = msg.timestamp;\n        }\n        else if (\"ts\" in msg) {\n            payload.timestamp = msg.ts;\n        }\n    }\n}\nelse{\n    let buffer = context.get(trace_name) || {}\n    let ts = \"\"\n\n    if (env.get(\"format_ts\") == 3) {\n        if (\"timestamp\" in msg) {\n            ts = msg.timestamp;\n        }\n        else if (\"ts\" in msg) {\n            ts = msg.ts;\n        }\n    }\n\n    if(\"value\" in buffer){\n        buffer.value.push(value)\n        buffer.timestamp.push(ts)\n    }\n    else{\n        buffer.value = []\n        buffer.timestamp = []\n        buffer.value.push(value)\n        buffer.timestamp.push(ts)\n    }\n    \n    context.set(trace_name,buffer)\n\n    if (buffer.value.length >= buffer_size){\n       payload = {\n            \"value\": buffer.value,\n            \"timestamp\": buffer.timestamp,\n            \"chart_history_size\": chart_history_size\n        };\n        returnData = true;\n        context.set(trace_name,{})\n    }\n}\n\nmsg.topic = trace_name;\nmsg.chart_name = chart_name;\nmsg.payload = payload;\nmsg.line_params = trace_parameters\nmsg.action = \"append_data\";\nmsg.inTz = input_timezone;\nmsg.outTz = output_timezone;\n\nlet status_value = Math.round(value*100)/100\n\nif(env.get(\"show_status\")){\n    node.status({ fill: \"blue\", shape: \"dot\", text: trace_name + \": ~\" + status_value });\n}\nelse{\n    //\n}\n\nif(returnData){\n    return msg;\n}\nelse {\n}",
+            "func": "let chart_history_size;\nlet trace_parameters = {};\nlet marker_parameters = {};\nlet chart_name = \"\";\nlet trace_name = \"\";\nlet value = msg.payload;\nlet buffer_size;\nlet payload;\nlet returnData = false;\nlet input_timezone = \"ETC/UTC\";\nlet output_timezone = \"ETC/UTC\"; \nlet y_axis;\nlet chart_mode;\nlet chart_type;\nlet hover_template;\nlet action;\n\nif(\"topic\" in msg){\n    trace_name = msg.topic;\n}\nelse{\n    trace_name = env.get(\"trace_name\")\n}\n\n//Override if present in msg\nif (\"input_timezone\" in msg) {\n    input_timezone = msg.input_timezone\n}\nelse {\n    input_timezone = env.get(\"in_tz\")\n}\n\nif (\"output_timezone\" in msg) {\n    output_timezone = msg.output_timezone\n}\nelse {\n    output_timezone = env.get(\"out_tz\")\n}\n\n\nif (\"chart_name\" in msg) {\n    chart_name = msg.chart_name\n}\nelse {\n    chart_name = env.get(\"chart_name\")\n}\n\nif (\"buffer_size\" in msg) {\n    buffer_size = msg.buffer_size\n}\nelse {\n    buffer_size = env.get(\"buffer_size\")\n}\n\nif (\"trace_parameters\" in msg) {\n    trace_parameters = msg.trace_parameters\n}\nelse {\n    trace_parameters = env.get(\"trace_parameters\")\n}\n\nif (\"marker_parameters\" in msg) {\n    marker_parameters = msg.marker_parameters\n}\nelse {\n    marker_parameters = env.get(\"marker_parameters\")\n}\n\n\nif (\"y_axis\" in msg) {\n    y_axis = msg.y_axis\n}\nelse {\n    y_axis = env.get(\"y_axis\")\n}\n\nif (\"action\" in msg) {\n    action = msg.action\n}\nelse {\n    action = env.get(\"action\")\n}\n\n\n\nif (\"chart_mode\" in msg) {\n    chart_mode = msg.chart_mode\n}\nelse {\n    chart_mode = env.get(\"chart_mode\")\n}\n\nif (\"chart_type\" in msg) {\n    chart_type = msg.chart_type\n}\nelse {\n    chart_type = env.get(\"chart_type\")\n}\n\nif (\"hover_template\" in msg) {\n    hover_template = msg.hover_template\n}\nelse {\n    hover_template = env.get(\"hover_template\")\n}\n\nif (\"chart_history_size\" in msg) {\n    chart_history_size = msg.chart_history_size\n}\nelse {\n    chart_history_size = env.get(\"chart_history_size\")\n}\n\nif (buffer_size < 2){\n    returnData = true;\n    payload = {\n        \"value\": value,\n        \"timestamp\": \"\",\n        \"chart_history_size\": chart_history_size\n    };\n\n    if (env.get(\"format_ts\") == 3) {\n\n        if (\"timestamp\" in msg) {\n            payload.timestamp = msg.timestamp;\n        }\n        else if (\"ts\" in msg) {\n            payload.timestamp = msg.ts;\n        }\n    }\n    else if(env.get(\"format_ts\") == 4) {\n\n        if (\"timestamp\" in msg) {\n            payload.timestamp = msg.timestamp;\n        }\n        else if (\"ts\" in msg) {\n            payload.timestamp = msg.ts;\n        }\n    }\n}\nelse{\n    let buffer = context.get(trace_name) || {}\n    let ts = \"\"\n\n    if (env.get(\"format_ts\") == 3) {\n        if (\"timestamp\" in msg) {\n            ts = msg.timestamp;\n        }\n        else if (\"ts\" in msg) {\n            ts = msg.ts;\n        }\n    }\n    else if(env.get(\"format_ts\") == 4) {\n\n        if (\"timestamp\" in msg) {\n            ts = msg.timestamp;\n        }\n        else if (\"ts\" in msg) {\n            ts = msg.ts;\n        }\n    }\n\n    if(\"value\" in buffer){\n        buffer.value.push(value)\n        buffer.timestamp.push(ts)\n    }\n    else{\n        buffer.value = []\n        buffer.timestamp = []\n        buffer.value.push(value)\n        buffer.timestamp.push(ts)\n    }\n    \n    context.set(trace_name,buffer)\n\n    if (buffer.value.length >= buffer_size){\n       payload = {\n            \"value\": buffer.value,\n            \"timestamp\": buffer.timestamp,\n            \"chart_history_size\": chart_history_size\n        };\n        returnData = true;\n        context.set(trace_name,{})\n    }\n}\n\nmsg.topic = trace_name;\nmsg.chart_name = chart_name;\nmsg.payload = payload;\nmsg.line_params = trace_parameters\nmsg.marker_params = marker_parameters\nmsg.action = action;\nmsg.inTz = input_timezone;\nmsg.outTz = output_timezone;\nmsg.y_axis = y_axis;\nmsg.chart_mode = chart_mode;\nmsg.chart_type = chart_type;\nmsg.hover_template = hover_template;\n\nlet status_value = Math.round(value*100)/100\n\nif(env.get(\"show_status\")){\n    \n    if(action == \"update_data\"){\n        node.status({ fill: \"blue\", shape: \"dot\", text: trace_name + \": ~\" + status_value });\n    }\n    else if(action == \"add_data\"){\n        node.status({ fill: \"blue\", shape: \"dot\", text: trace_name + \" : \" + value.length+\" values\"});    \n    }\n    \n    \n    \n}\nelse{\n    //\n}\n\nif(returnData){\n    return msg;\n}\nelse {\n}",
             "outputs": 1,
             "timeout": 0,
             "noerr": 0,
@@ -265,7 +431,7 @@
             "y": 80,
             "wires": [
                 [
-                    "cde51dcd38cf9b33"
+                    "5baa100c2653965d"
                 ]
             ]
         },
@@ -274,9 +440,11 @@
             "type": "status",
             "z": "2f623c042f7c2495",
             "name": "",
-            "scope": null,
-            "x": 220,
-            "y": 260,
+            "scope": [
+                "c064c15c718930d9"
+            ],
+            "x": 240,
+            "y": 380,
             "wires": [
                 []
             ]
@@ -303,13 +471,18 @@
                     "t": "eq",
                     "v": "3",
                     "vt": "num"
+                },
+                {
+                    "t": "eq",
+                    "v": "4",
+                    "vt": "num"
                 }
             ],
             "checkall": "true",
             "repair": false,
-            "outputs": 3,
-            "x": 390,
-            "y": 80,
+            "outputs": 4,
+            "x": 430,
+            "y": 160,
             "wires": [
                 [
                     "6dcce9166e282a19"
@@ -317,7 +490,10 @@
                 [
                     "fbfb9bee81eaa95c"
                 ],
-                []
+                [],
+                [
+                    "6556dea93f5072f2"
+                ]
             ]
         },
         {
@@ -338,35 +514,81 @@
             "outputType": "msg",
             "outTz": "ETC/UTC",
             "x": 650,
-            "y": 40,
+            "y": 120,
             "wires": [
                 []
             ]
         },
         {
-            "id": "95c652c3083b119d",
-            "type": "subflow:2f623c042f7c2495",
-            "z": "debe57df1350b9f8",
-            "name": "",
-            "env": [
+            "id": "5baa100c2653965d",
+            "type": "switch",
+            "z": "2f623c042f7c2495",
+            "name": "chart_type?",
+            "property": "chart_type",
+            "propertyType": "env",
+            "rules": [
                 {
-                    "name": "chart_name",
-                    "value": "x_chart",
-                    "type": "str"
+                    "t": "eq",
+                    "v": "bar",
+                    "vt": "str"
                 },
                 {
-                    "name": "trace_name",
-                    "value": "x",
-                    "type": "str"
+                    "t": "else"
                 }
             ],
-            "x": 680,
-            "y": 160,
+            "checkall": "true",
+            "repair": false,
+            "outputs": 2,
+            "x": 630,
+            "y": 40,
             "wires": [
+                [],
                 [
-                    "5724de7a73044d14"
+                    "cde51dcd38cf9b33"
                 ]
             ]
+        },
+        {
+            "id": "6556dea93f5072f2",
+            "type": "moment",
+            "z": "2f623c042f7c2495",
+            "name": "ts",
+            "topic": "",
+            "input": "payload.timestamp",
+            "inputType": "msg",
+            "inTz": "ETC/UTC",
+            "adjAmount": 0,
+            "adjType": "days",
+            "adjDir": "add",
+            "format": "YYYY-MM-DD HH:mm:ss.SSS",
+            "locale": "en-US",
+            "output": "payload.timestamp",
+            "outputType": "msg",
+            "outTz": "ETC/UTC",
+            "x": 650,
+            "y": 240,
+            "wires": [
+                []
+            ]
+        },
+        {
+            "id": "ff3d844fa3e0e089",
+            "type": "subflow:2f623c042f7c2495",
+            "z": "c49b3020b5a4b737",
+            "name": "",
+            "x": 440,
+            "y": 360,
+            "wires": [
+                []
+            ]
+        },
+        {
+            "id": "10d4107c13147b54",
+            "type": "global-config",
+            "env": [],
+            "modules": {
+                "node-red-contrib-moment": "5.0.0"
+            }
         }
     ]
 }
