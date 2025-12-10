@@ -368,7 +368,7 @@
     ],
     "meta": {
         "module": "tequ-node-red-plotly-trace",
-        "version": "0.2",
+        "version": "0.2.0",
         "author": "juha.autioniemi@lapinamk.fi",
         "desc": "Format Plotly trace",
         "license": "MIT"
@@ -583,7 +583,7 @@
             ]
         },
         {
-            "id": "10d4107c13147b54",
+            "id": "8c40e0b3bddcfe48",
             "type": "global-config",
             "env": [],
             "modules": {
