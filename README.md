@@ -7,7 +7,7 @@ Format Plotly trace
 
 Run the following command in your Node-RED user directory - typically `~/.node-red`
 
-        npm install tequ-node-red-plotly-trace
+        npm install Lapland-UAS-Tequ/tequ-node-red-plotly-trace
 
 ## Information
 
